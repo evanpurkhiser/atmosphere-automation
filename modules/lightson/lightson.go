@@ -36,7 +36,8 @@ type DeviceLightsTrigger struct {
 	RouterPollInterval time.Duration
 
 	// DebouceInterval specifies the time to wait before powering the lights
-	// off. This allows the service to wait to ensure the device is not
+	// off and the time range which the lights should not be powered on after a
+	// disconnect. This allows the service to wait to ensure the device is not
 	// reconnected to the network, as some devices tend to disconnect and
 	// reconnect within a short period of time.
 	DebouceInterval time.Duration
@@ -66,8 +67,14 @@ func (dt *DeviceLightsTrigger) lightsOff(cancel chan bool) {
 }
 
 // lightsOn sets the lights to the specified scene. This will only recall the
-// scene given that all lights are currently off.
-func (dt *DeviceLightsTrigger) lightsOn() {
+// scene given that all lights are currently off and that the last disconnect
+// doesn't fall within the debounce duration.
+func (dt *DeviceLightsTrigger) lightsOn(lastDisconnect time.Time) {
+	// Do nothing if we're before the debounce time
+	if time.Now().Sub(lastDisconnect) < dt.DebouceInterval {
+		return
+	}
+
 	lights, _ := dt.HueBridge.GetAllLights()
 
 	// Do nothing if any of the lights are currently on
@@ -95,6 +102,7 @@ func (dt *DeviceLightsTrigger) Start() error {
 	}
 
 	cancelPowerOff := make(chan bool, 1)
+	lastDisconnect := time.Now()
 
 	listener := func(change *netgear.ChangedDevice, err error) {
 		if err != nil {
@@ -106,6 +114,7 @@ func (dt *DeviceLightsTrigger) Start() error {
 		}
 
 		if change.Change == netgear.DeviceRemoved {
+			lastDisconnect = time.Now()
 			go dt.lightsOff(cancelPowerOff)
 			return
 		}
@@ -114,7 +123,7 @@ func (dt *DeviceLightsTrigger) Start() error {
 		close(cancelPowerOff)
 		cancelPowerOff = make(chan bool, 1)
 
-		go dt.lightsOn()
+		go dt.lightsOn(lastDisconnect)
 	}
 
 	dt.NetgearClient.OnDeviceChanged(dt.RouterPollInterval, listener)

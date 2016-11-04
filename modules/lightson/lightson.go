@@ -117,8 +117,7 @@ func (dt *DeviceLightsTrigger) Start() error {
 		go dt.lightsOn()
 	}
 
-	pollTime := time.Second * 10
-	dt.NetgearClient.OnDeviceChanged(pollTime, listener)
+	dt.NetgearClient.OnDeviceChanged(dt.RouterPollInterval, listener)
 
 	// TODO: Add a DeviceLightsTrigger.Stop() method which ensures the
 	//       OnDeviceChanges call is also stopped. Currently this method

@@ -8,6 +8,11 @@ import (
 	"go.evanpurkhiser.com/netgear"
 )
 
+// ShouldTurnOn is a function that determines if the lights should turn on.
+// This can be used to specify additional rules for if the lights should come
+// on or not.
+type ShouldTurnOn func() bool
+
 // DeviceLightsTrigger is a service that listens for a device to connect or
 // disconnect from the network and will trigger a specified hue scene.
 type DeviceLightsTrigger struct {
@@ -35,6 +40,11 @@ type DeviceLightsTrigger struct {
 	// reconnected to the network, as some devices tend to disconnect and
 	// reconnect within a short period of time.
 	DebouceInterval time.Duration
+
+	// ShouldTurnOnHooks is a list of ShouldTurnOn functions that will be
+	// executed prior to the lights being turned on. Should any return false,
+	// the lights will not turn on.
+	ShouldTurnOnHooks []ShouldTurnOn
 }
 
 // lightsOff turns all lights off. This will wait wait before turning off the
@@ -63,6 +73,13 @@ func (dt *DeviceLightsTrigger) lightsOn() {
 	// Do nothing if any of the lights are currently on
 	for _, light := range lights {
 		if light.State.On {
+			return
+		}
+	}
+
+	// Ensure all should turn on hooks pass
+	for _, hook := range dt.ShouldTurnOnHooks {
+		if !hook() {
 			return
 		}
 	}

@@ -52,7 +52,6 @@ func (dt *DeviceLightsTrigger) lightsOff(cancel chan bool) {
 	}
 
 	nope := false
-
 	dt.HueBridge.SetGroupState(0, &hue.Action{On: &nope})
 }
 

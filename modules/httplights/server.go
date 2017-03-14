@@ -23,8 +23,11 @@ type HTTPLightsModule interface {
 // Server provides a means to register http controlled light modules that may
 // be triggered over http.
 type Server struct {
-	// HueBridge configures the bridge to control lights through
+	// HueBridge configures the bridge to control lights through.
 	HueBridge *hue.Bridge
+
+	// ServerAddr configures the address that the HTTP server should listen on.
+	ServerAddr string
 
 	modules []HTTPLightsModule
 }
@@ -43,5 +46,5 @@ func (s *Server) Start() {
 		module.SetHueBridge(s.HueBridge)
 	}
 
-	go http.ListenAndServe(":8080", router)
+	go http.ListenAndServe(s.ServerAddr, router)
 }

@@ -1,0 +1,21 @@
+hash: c85bdae2f68b1d14a583a299a39e237747938929037cbb56baad4bee86e41941
+updated: 2017-03-15T21:23:02.906828233-07:00
+imports:
+- name: github.com/collinux/gohue
+  version: fix-action-types
+  repo: https://github.com/EvanPurkhiser/GoHue.git
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: 392c28fe23e1c45ddba891b0320b3b5df220beea
+- name: github.com/kelseyhightower/envconfig
+  version: f611eb38b3875cc3bd991ca91c51d06446afa14c
+- name: github.com/sirupsen/logrus
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
+- name: go.evanpurkhiser.com/netgear
+  version: 73e5362bb0656f71dc283a6e51c6a356ca687d94
+- name: golang.org/x/sys
+  version: 99f16d856c9836c42d24e7ab64ea72916925fa97
+  subpackages:
+  - unix
+testImports: []

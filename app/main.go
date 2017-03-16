@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"net"
@@ -12,7 +12,7 @@ import (
 	"go.evanpurkhiser.com/aauto/modules/lightson"
 )
 
-func main() {
+func StartApp() {
 	config := ReadConfig()
 
 	hueBridge, err := hue.NewBridge(config.BridgeAddr)
@@ -69,6 +69,4 @@ func main() {
 	httpServer.RegisterModule(&httplights.SelectScene{})
 
 	httpServer.Start()
-
-	<-make(chan int)
 }

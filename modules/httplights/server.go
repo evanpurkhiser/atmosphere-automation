@@ -5,6 +5,7 @@ import (
 
 	"github.com/collinux/gohue"
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 // HTTPLightsModule is an interface that can be implemented to allow a type to
@@ -30,6 +31,8 @@ type Server struct {
 	ServerAddr string
 
 	modules []HTTPLightsModule
+
+	logger logrus.FieldLogger
 }
 
 // RegisterModule registers a http lights module.
@@ -39,6 +42,11 @@ func (s *Server) RegisterModule(module HTTPLightsModule) {
 
 // Start starts the http light server
 func (s *Server) Start() {
+	s.logger = logrus.WithFields(logrus.Fields{
+		"module":  "httplights",
+		"address": s.ServerAddr,
+	})
+
 	router := mux.NewRouter()
 
 	for _, module := range s.modules {
@@ -47,4 +55,6 @@ func (s *Server) Start() {
 	}
 
 	go http.ListenAndServe(s.ServerAddr, router)
+
+	s.logger.Info("Started http lights server.")
 }

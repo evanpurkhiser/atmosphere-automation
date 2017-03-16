@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"net"
 	"time"
 
 	"github.com/collinux/gohue"
+	"github.com/sirupsen/logrus"
 	"go.evanpurkhiser.com/netgear"
 
 	"go.evanpurkhiser.com/aauto/modules/httplights"
@@ -17,17 +17,15 @@ func main() {
 
 	hueBridge, err := hue.NewBridge(config.BridgeAddr)
 	if err != nil {
-		log.Printf("Unable to connect to hue bridge: %s\n", err)
-		return
+		logrus.Fatalf("Unable to connect to hue bridge: %s\n", err)
 	}
 
 	err = hueBridge.Login(config.BridgeLogin)
 	if err != nil {
-		log.Printf("Cannot login to hue bridge: %s\n", err)
-		return
+		logrus.Fatalf("Cannot login to hue bridge: %s\n", err)
 	}
 
-	log.Printf("Hue Bridge authenticated.")
+	logrus.Infof("Hue Bridge authenticated.")
 
 	// Configure WiFi phone connection light trigger
 	netgearClient := netgear.NewClient(
@@ -49,10 +47,8 @@ func main() {
 
 	err = lightsonService.Start()
 	if err != nil {
-		log.Fatalf("Could not start listening: %q\n", err)
+		logrus.Fatalf("Could not start listening: %s\n", err)
 	}
-
-	log.Printf("LightsOn WiFi MAC trigger started.")
 
 	httpServer := httplights.Server{
 		HueBridge:  hueBridge,
@@ -73,8 +69,6 @@ func main() {
 	httpServer.RegisterModule(&httplights.SelectScene{})
 
 	httpServer.Start()
-
-	log.Printf("Http server started.")
 
 	<-make(chan int)
 }

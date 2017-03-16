@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/collinux/gohue"
+	"github.com/sirupsen/logrus"
 	"go.evanpurkhiser.com/netgear"
 )
 
@@ -46,6 +47,8 @@ type DeviceLightsTrigger struct {
 	// executed prior to the lights being turned on. Should any return false,
 	// the lights will not turn on.
 	ShouldTurnOnHooks []ShouldTurnOn
+
+	logger logrus.FieldLogger
 }
 
 // lightsOff turns all lights off. This will wait wait before turning off the
@@ -101,6 +104,11 @@ func (dt *DeviceLightsTrigger) Start() error {
 		return err
 	}
 
+	dt.logger = logrus.WithFields(logrus.Fields{
+		"module":      "lightson",
+		"mac_address": dt.TriggerDeviceMAC,
+	})
+
 	cancelPowerOff := make(chan bool, 1)
 	lastDisconnect := time.Now()
 
@@ -112,6 +120,10 @@ func (dt *DeviceLightsTrigger) Start() error {
 		if change.Device.MAC.String() != dt.TriggerDeviceMAC.String() {
 			return
 		}
+
+		dt.logger.
+			WithField("device_status", change.Change).
+			Infof("Detected device status change")
 
 		if change.Change == netgear.DeviceRemoved {
 			lastDisconnect = time.Now()
@@ -127,6 +139,8 @@ func (dt *DeviceLightsTrigger) Start() error {
 	}
 
 	dt.NetgearClient.OnDeviceChanged(dt.RouterPollInterval, listener)
+
+	dt.logger.Info("Listening for device connections.")
 
 	// TODO: Add a DeviceLightsTrigger.Stop() method which ensures the
 	//       OnDeviceChanges call is also stopped. Currently this method

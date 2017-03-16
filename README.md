@@ -33,3 +33,5 @@ NETGEAR_PASS="password"
 # The HTTP API binding address
 HTTP_SERVER_ADDR=:8080
 ```
+
+This service is [configured on my raspberry pi `atmosphere`](https://github.com/EvanPurkhiser/ansible-personal/tree/master/roles/machines/atmosphere).

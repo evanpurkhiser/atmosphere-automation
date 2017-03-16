@@ -1,0 +1,9 @@
+[Unit]
+Description=Atmosphere automation service
+
+[Service]
+EnvironmentFile=/etc/atmosphere-automation.conf
+ExecStart=/usr/bin/atmosphere-automation
+
+[Install]
+WantedBy=multi-user.target

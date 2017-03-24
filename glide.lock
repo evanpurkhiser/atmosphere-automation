@@ -1,9 +1,8 @@
 hash: c85bdae2f68b1d14a583a299a39e237747938929037cbb56baad4bee86e41941
-updated: 2017-03-15T21:23:02.906828233-07:00
+updated: 2017-03-24T02:44:58.519835933-07:00
 imports:
 - name: github.com/collinux/gohue
-  version: fix-action-types
-  repo: https://github.com/EvanPurkhiser/GoHue.git
+  version: 4f55f62ea95532c37630cd160164b823c200fb8c
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
